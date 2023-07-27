@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::put('', [CompnayController::class, 'index']);
+Route::get('', [CompnayController::class, 'index']);
 Route::group(['prefix' => 'account'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);

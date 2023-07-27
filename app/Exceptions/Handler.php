@@ -52,12 +52,10 @@ class Handler extends ExceptionHandler
             });
 
             $this->renderable(function (MethodNotAllowedException $e, Request $request) {
-                if ($request->is('api/*')) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'the request method is wrong',
-                    ], 400);
-                }
+                return response()->json([
+                    'status' => false,
+                    'message' => 'the request method is wrong',
+                ], 400);
             });
 
             $this->renderable(function (AuthenticationException $e, Request $request) {

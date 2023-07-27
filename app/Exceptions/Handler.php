@@ -2,7 +2,14 @@
 
 namespace App\Exceptions;
 
+use BadMethodCallException;
+use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -34,8 +41,42 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
+        if (env('debug', 'true') == 'false') {
+            $this->renderable(function (NotFoundHttpException $e, Request $request) {
+                if ($request->is('api/*')) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'the URL is wrong',
+                    ], 404);
+                }
+            });
+
+            $this->renderable(function (MethodNotAllowedException $e, Request $request) {
+                if ($request->is('api/*')) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'the request method is wrong',
+                    ], 400);
+                }
+            });
+
+            $this->renderable(function (AuthenticationException $e, Request $request) {
+                if ($request->is('api/*')) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'the user is unauthenticated',
+                    ], 401);
+                }
+            });
+
+            $this->renderable(function (Exception $e, Request $request) {
+                if ($request->is('api/*')) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'some error happened in the server please try again later',
+                    ], 500);
+                }
+            });
+        }
     }
 }

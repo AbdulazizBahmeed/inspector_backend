@@ -16,7 +16,7 @@ class CreateCampsTable extends Migration
         Schema::create('camps', function (Blueprint $table) {
             $table->id();
             $table->char("camp_lable", 7);
-            $table->char("upgraded_camp_label", 50);
+            $table->string("upgraded_camp_label");
             $table->foreignId('zone_id')->constrained('zones','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('company_id')->constrained('companies','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();

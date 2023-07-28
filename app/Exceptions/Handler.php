@@ -41,7 +41,7 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        if ((bool) env('APP_DEBUG', false)) {
+        if ((bool) env('APP_DEBUGg', false)) {
             $this->renderable(function (NotFoundHttpException $e, Request $request) {
                 if ($request->is('api/*')) {
                     return response()->json([

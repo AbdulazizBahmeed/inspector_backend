@@ -1,9 +1,6 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CompnayController;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Controllers\auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,11 +13,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('cakes', [CompnayController::class, 'index']);
+
 Route::group(['prefix' => 'account'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('logout', [AuthController::class, 'logout'])->middleware("auth:sanctum");
+    Route::post('logout', [AuthController::class, 'logout']);
     Route::get('unauthenticated', [AuthController::class, 'unauthenticated'])->name("auth.unauthenticated");
 });
 

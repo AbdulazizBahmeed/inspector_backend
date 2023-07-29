@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -63,12 +61,19 @@ class AuthController extends Controller
 
     public function logout()
     {
-        auth()->user()->tokens()->delete();
-
+        if (auth()->user()) {
+            auth()->user()->tokens()->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'user logged out successfully',
+            ], 200);
+        }
         return response()->json([
-            'status' => true,
-            'message' => 'user logged out successfully',
-        ], 200);
+            'status' => false,
+            'message' => 'there is no token in the request',
+        ], 401);
+        
+        
     }
     public function unauthenticated()
     {

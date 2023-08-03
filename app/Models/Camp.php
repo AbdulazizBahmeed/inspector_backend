@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Camp extends Model
 {
@@ -15,8 +17,8 @@ class Camp extends Model
         return $this->BelongsTo(Zone::class);
     }
 
-    public function company(): BelongsTo
+    public function companies(): BelongsToMany
     {
-        return $this->BelongsTo(company::class);
+        return $this->belongsToMany(Company::class);
     }
 }

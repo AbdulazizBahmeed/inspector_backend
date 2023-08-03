@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCampsTable extends Migration
+class CreateCampsCompaniesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateCampsTable extends Migration
      */
     public function up()
     {
-        Schema::create('camps', function (Blueprint $table) {
+        Schema::create('camp_company', function (Blueprint $table) {
             $table->id();
-            $table->char("camp_lable", 7);
-            $table->string("upgraded_camp_label")->nullable();
-            $table->foreignId('zone_id')->constrained('zones','id')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('camp_id')->constrained('camps','id')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('company_id')->constrained('companies','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateCampsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('camps');
+        Schema::dropIfExists('camps_companies');
     }
 }

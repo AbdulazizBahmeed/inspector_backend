@@ -19,7 +19,6 @@ class CreateUsersTable extends Migration
             $table->char('national_id', 10)->unique();
             $table->string('password');
             $table->text('personal_photo');
-            $table->rememberToken();
             $table->timestamps();
         });
     }

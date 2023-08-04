@@ -41,7 +41,7 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        if (env("APP_DEBUG")) {
+        if (!config('app.debug')) {
             $this->renderable(function (NotFoundHttpException $e, Request $request) {
                 if ($request->is('api/*')) {
                     return response()->json([
@@ -70,12 +70,10 @@ class Handler extends ExceptionHandler
             });
 
             $this->renderable(function (Exception $e, Request $request) {
-                if ($request->is('api/*')) {
                     return response()->json([
                         'status' => false,
                         'message' => 'some error happened in the server please try again later',
                     ], 500);
-                }
             });
         }
     }

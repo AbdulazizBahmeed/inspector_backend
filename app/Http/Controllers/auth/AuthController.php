@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\auth;
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -48,8 +48,8 @@ class AuthController extends Controller
         if ($validation->fails() | !Auth::attempt($request->only(['national_id', 'password']))) {
             return response()->json([
                 'status' => false,
-                'message' => 'Email & Password does not match with our record.',
-            ], 400);
+                'message' => 'the user name and password does not match our records',
+            ], 401);
         } else {
             return response()->json([
                 'status' => true,
@@ -63,17 +63,11 @@ class AuthController extends Controller
     {
         if (auth()->user()) {
             auth()->user()->tokens()->delete();
-            return response()->json([
-                'status' => true,
-                'message' => 'user logged out successfully',
-            ], 200);
         }
         return response()->json([
-            'status' => false,
-            'message' => 'there is no token in the request',
-        ], 401);
-        
-        
+            'status' => true,
+            'message' => 'user logged out successfully',
+        ], 200);
     }
     public function unauthenticated()
     {

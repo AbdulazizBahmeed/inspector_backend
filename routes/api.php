@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\auth\AuthController;
-use App\Http\Controllers\camps\CampsController;
+use App\Http\Controllers\camps\CampController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,15 +14,16 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('', [CampsController::class, 'index']);
 Route::group(['prefix' => 'account'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('unauthenticated', [AuthController::class, 'unauthenticated'])->name("auth.unauthenticated");
+    Route::post('unauthenticated', [AuthController::class, 'unauthenticated'])->name("auth.unauthenticated");
+    Route::get('unauthenticated', [AuthController::class, 'unauthenticated']);
 });
 
-Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'companies'], function () {
-    Route::get('', [CompnayController::class, 'index']);
+Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'home-page'], function () {
+    Route::get('camps', [CampController::class, 'getAllCamps']);
+    Route::get('batches', [CampController::class, 'getAllBatches']);
 });
 

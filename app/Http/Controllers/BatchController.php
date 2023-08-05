@@ -21,7 +21,7 @@ class BatchController extends Controller
         foreach ($zones as $zone) {
             foreach ($zone->camps as $camp) {
                 foreach ($camp->batches as $batch) {
-                    $data['day '.$batch->deaprture_day][] = $this->formatBatchCard($batch);
+                    $data['day '.$batch->departure_day][] = $this->formatBatchCard($batch);
                 }
             }
         }

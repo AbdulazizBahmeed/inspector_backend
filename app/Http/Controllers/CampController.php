@@ -23,8 +23,8 @@ class CampController extends Controller
         foreach ($zones as $zone) {
             foreach ($zone->camps as $camp) {
                 foreach($camp->batches as $batch){
-                    if(!$data['day '.$batch->deaprture_day]->contains('id', $camp->id)){
-                        $data['day '.$batch->deaprture_day]->push($camp);
+                    if(!$data['day '.$batch->departure_day]->contains('id', $camp->id)){
+                        $data['day '.$batch->departure_day]->push($camp);
                     }
                 }
             }

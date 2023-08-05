@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Camp;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,7 @@ class BatchController extends Controller
         foreach ($zones as $zone) {
             foreach ($zone->camps as $camp) {
                 foreach ($camp->batches as $batch) {
-                    $data['day '.$batch->departure_day][] = $this->formatBatchCard($batch);
+                    $data['day ' . $batch->departure_day][] = $this->formatBatchCard($batch);
                 }
             }
         }
@@ -34,8 +35,27 @@ class BatchController extends Controller
             'data' => $data
         ], 200);
     }
+    public function show(Request $request, $campId, $day)
+    {
+        $batches = Camp::with(['batches' => function ($query) use ($day) {
+            $query->where('departure_day', $day);
+        }])->where('id', $campId)->first()->batches;
+        
+        $sortedBatches = $batches->sortBy('departure_time')->values();
 
-    public function formatBatchCard($batch){
+        foreach ($sortedBatches as $batch) {
+            $data[] = $this->formatBatchCard($batch);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'retrieved the data successfully',
+            'data' => $data
+        ], 200);
+    }
+
+    public function formatBatchCard($batch)
+    {
         $result = [
             'batch_id' => $batch->id,
             'company_name' => $batch->office->company->name,

@@ -25,6 +25,7 @@ Route::group(['prefix' => 'account'], function () {
 
 Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'batches'], function () {
     Route::get('', [BatchController::class, 'index']);
+    Route::get('/{campId}/{day}', [BatchController::class, 'show']);
 });
 
 Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'camps'], function () {

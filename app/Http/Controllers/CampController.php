@@ -33,8 +33,8 @@ class CampController extends Controller
             $campsSorted =  $camps->sortBy(function($camp){
                 return $camp->batches->min('departure_time');
             })->values();
-            $data[$day] = $campsSorted->map(function($campData){
-                return $this->formatCampCard($campData);
+            $data[$day] = $campsSorted->map(function($campData) use($day){
+                return $this->formatCampCard($campData,substr($day,4));
             });
         }
         return response()->json([
@@ -44,12 +44,15 @@ class CampController extends Controller
         ], 200);
     }
 
-    public function formatCampCard($camp)
+    public function formatCampCard($camp,$day)
     {
         $result = [
             'camp_id' => $camp->id,
-            'camp_number' => $camp->upgraded_camp_label? $camp->upgraded_camp_label:$camp->camp_label,
-            'batches_count'=> $camp->batches->count()
+            'camp_number' => $camp->camp_label,
+            'camp_upgraded_number' => $camp->upgraded_camp_label,
+            'batches_count'=> $camp->batches->filter(function ($value,$key) use($day){
+                return $value->departure_day == $day;
+            })->count()
         ];
         return $result;
     }

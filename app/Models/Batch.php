@@ -5,16 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Batch extends Model
 {
     use HasFactory;
-
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-        'camp_id',
-    ];
 
     public function camp(): BelongsTo
     {
@@ -24,5 +19,10 @@ class Batch extends Model
     public function office(): BelongsTo
     {
         return $this->BelongsTo(Office::class);
+    }
+
+    public function report(): HasOne
+    {
+        return $this->HasOne(Report::class);
     }
 }

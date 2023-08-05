@@ -6,12 +6,16 @@ use App\Models\Camp;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 
+use function PHPSTORM_META\map;
+
 class BatchController extends Controller
 {
     public function index(Request $request)
     {
         $user = auth()->user();
-        $zones = Zone::with("camps.batches.office.company")->where('user_id', $user->id)->get();
+        $zones = Zone::with(['camps' => function ($query) {
+            $query->with(['batches.office.company', 'batches.camp']);
+        }])->where('user_id', $user->id)->get();
         $data = [
             'day 9' => [],
             'day 10' => [],
@@ -22,12 +26,17 @@ class BatchController extends Controller
         foreach ($zones as $zone) {
             foreach ($zone->camps as $camp) {
                 foreach ($camp->batches as $batch) {
-                    $data['day ' . $batch->departure_day][] = $this->formatBatchCard($batch);
+                    $data['day ' . $batch->departure_day][] = $batch;
                 }
             }
         }
         foreach ($data as $day => $batches) {
-            $data[$day] = collect($batches)->sortBy('departure_time')->values();
+            $sortedBatches = collect($batches)->sortBy(function ($batch) {
+                return $batch->departure_time;
+            })->values();
+            $data[$day] = $sortedBatches->map(function($batchData) use($day){
+                return $this->formatBatchCard($batchData);
+            });
         }
         return response()->json([
             'status' => true,
@@ -38,9 +47,10 @@ class BatchController extends Controller
     public function show(Request $request, $campId, $day)
     {
         $batches = Camp::with(['batches' => function ($query) use ($day) {
-            $query->where('departure_day', $day);
+            $query->with(['camp','office.company'])->where('departure_day', $day);
         }])->where('id', $campId)->first()->batches;
-        
+
+        $data=[];
         $sortedBatches = $batches->sortBy('departure_time')->values();
 
         foreach ($sortedBatches as $batch) {
@@ -57,12 +67,13 @@ class BatchController extends Controller
     public function formatBatchCard($batch)
     {
         $result = [
+            'camp_id' => $batch->camp->id,
             'batch_id' => $batch->id,
             'company_name' => $batch->office->company->name,
             'batch_name' => $batch->name,
             'office_number' => $batch->office->number,
-            'departure_time' => $batch->departure_time,
-            'prilgims_count' => $batch->pilgrims_count
+            'departure_time' => date("h:i a", strtotime($batch->departure_time)) ,
+            'prilgims_count' => $batch->pilgrims_count,
         ];
         return $result;
     }

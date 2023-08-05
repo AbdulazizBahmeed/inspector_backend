@@ -9,10 +9,9 @@ class BatchController extends Controller
 {
     public function index(Request $request)
     {
-        // $zones = $request->user()->zones;
-        $user = $request->user();
+        $user = auth()->user();
         $zones = Zone::with("camps.batches.office.company")->where('user_id', $user->id)->get();
-
+        return [$zones];
         $data = [
             'day 9' => [],
             'day 10' => [],
@@ -23,21 +22,29 @@ class BatchController extends Controller
         foreach ($zones as $zone) {
             foreach ($zone->camps as $camp) {
                 foreach ($camp->batches as $batch) {
-                    $companyName = $batch->office->company->name;
-                    // $batchData = $batch;
-                    // return gettype($companyName);
-                    // $batchData->push($companyName);
-                    $data['day ' . $batch->deaprture_day][] = $batch;
+                    $data['day '.$batch->deaprture_day][] = $this->formatBatchCard($batch);
                 }
             }
         }
         foreach ($data as $day => $batches) {
-            $data[$day] = collect($batches)->sortBy('departure_time')->flatten();
+            $data[$day] = collect($batches)->sortBy('departure_time')->values();
         }
         return response()->json([
             'status' => true,
             'message' => 'retrieved the data successfully',
             'data' => $data
         ], 200);
+    }
+
+    public function formatBatchCard($batch){
+        $result = [
+            'batch_id' => $batch->id,
+            'company_name' => $batch->office->company->name,
+            'batch_name' => $batch->name,
+            'office_number' => $batch->office->number,
+            'departure_time' => $batch->departure_time,
+            'prilgims_count' => $batch->pilgrims_count
+        ];
+        return $result;
     }
 }

@@ -23,8 +23,8 @@ class Camp extends Model
         return $this->BelongsTo(Zone::class);
     }
 
-    public function companies(): BelongsToMany
+    public function offices(): HasMany
     {
-        return $this->belongsToMany(Company::class);
+        return $this->HasMany(Office::class);
     }
 }

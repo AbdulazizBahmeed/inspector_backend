@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCampsCompaniesTable extends Migration
+class CreateOfficesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class CreateCampsCompaniesTable extends Migration
      */
     public function up()
     {
-        Schema::create('camp_company', function (Blueprint $table) {
+        Schema::create('offices', function (Blueprint $table) {
             $table->id();
+            $table->unsignedTinyInteger('number');
             $table->foreignId('camp_id')->constrained('camps','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('company_id')->constrained('companies','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
@@ -28,6 +29,6 @@ class CreateCampsCompaniesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('camps_companies');
+        Schema::dropIfExists('offices');
     }
 }

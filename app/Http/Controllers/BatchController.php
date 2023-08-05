@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\camps;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Zone;
 use Illuminate\Http\Request;
 
-class CampController extends Controller
+class BatchController extends Controller
 {
-    public function getAllCamps(Request $request)
+    public function index(Request $request)
     {
-        
-    }
+        // $zones = $request->user()->zones;
+        $user = $request->user();
+        $zones = Zone::with("camps.batches.office.company")->where('user_id', $user->id)->get();
 
-    public function getAllBatches(Request $request)
-    {
-        $zones = $request->user()->zones;
         $data = [
             'day 9' => [],
             'day 10' => [],
@@ -26,6 +23,10 @@ class CampController extends Controller
         foreach ($zones as $zone) {
             foreach ($zone->camps as $camp) {
                 foreach ($camp->batches as $batch) {
+                    $companyName = $batch->office->company->name;
+                    // $batchData = $batch;
+                    // return gettype($companyName);
+                    // $batchData->push($companyName);
                     $data['day ' . $batch->deaprture_day][] = $batch;
                 }
             }

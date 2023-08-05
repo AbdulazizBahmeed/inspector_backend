@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\auth\AuthController;
-use App\Http\Controllers\camps\CampController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BatchController;
+use App\Http\Controllers\CampController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,8 +23,7 @@ Route::group(['prefix' => 'account'], function () {
     Route::get('unauthenticated', [AuthController::class, 'unauthenticated']);
 });
 
-Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'home-page'], function () {
-    Route::get('camps', [CampController::class, 'getAllCamps']);
-    Route::get('batches', [CampController::class, 'getAllBatches']);
+Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'batches'], function () {
+    Route::get('', [BatchController::class, 'index']);
 });
 

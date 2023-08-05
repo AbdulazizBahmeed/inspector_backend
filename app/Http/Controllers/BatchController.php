@@ -11,7 +11,6 @@ class BatchController extends Controller
     {
         $user = auth()->user();
         $zones = Zone::with("camps.batches.office.company")->where('user_id', $user->id)->get();
-        return [$zones];
         $data = [
             'day 9' => [],
             'day 10' => [],

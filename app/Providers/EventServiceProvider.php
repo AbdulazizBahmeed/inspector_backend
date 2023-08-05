@@ -28,7 +28,7 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         //
-        if(!config('APP_DEBUG')){
+        if(config('app.debug')){
             Event::listen('Illuminate\Database\Events\QueryExecuted', function ($query) {
                 var_dump($query->sql);
             });

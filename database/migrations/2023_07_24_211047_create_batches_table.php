@@ -18,7 +18,7 @@ class CreateBatchesTable extends Migration
             $table->string("name");
             $table->unsignedBigInteger("pilgrims_count");
             $table->time("departure_time");
-            $table->enum("deaprture_day", [9, 10, 11, 12, 13]);
+            $table->enum("departure_day", [9, 10, 11, 12, 13]);
             $table->foreignId('camp_id')->constrained('camps','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('office_id')->constrained('offices','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();

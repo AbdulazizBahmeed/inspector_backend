@@ -17,6 +17,6 @@ class Answer extends Model
 
     public function question(): BelongsTo
     {
-        return $this->BelongsTo(Report::class);
+        return $this->BelongsTo(Question::class);
     }
 }

@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class CampController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user = $request->user();
+        $user = auth()->user();
         $zones = Zone::with(['camps.batches'])->where('user_id', $user->id)->get();
 
         $data = [

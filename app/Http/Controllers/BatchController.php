@@ -10,7 +10,7 @@ use function PHPSTORM_META\map;
 
 class BatchController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $user = auth()->user();
         $zones = Zone::with(['camps' => function ($query) {
@@ -44,8 +44,17 @@ class BatchController extends Controller
             'data' => $data
         ], 200);
     }
-    public function show(Request $request, $campId, $day)
+    public function show($campId, $day)
     {
+        // $userId = auth()->user()->id;
+        // $zone = Zone::whereHas('camps', function ($query) use($campId) {
+        //     $query->where('id', $campId);
+        // })->with(['camps' => function ($query) use ($day) {
+        //     $query->with(['batches' => function ($query) use ($day) {
+        //         $query->where('departure_day', $day);
+        //     }]);
+        // }])->where('user_id', $userId)->first()->camps->first->batches;
+        // return $zone;
         $batches = Camp::with(['batches' => function ($query) use ($day) {
             $query->with(['camp','office.company'])->where('departure_day', $day);
         }])->where('id', $campId)->first()->batches;
@@ -72,9 +81,16 @@ class BatchController extends Controller
             'company_name' => $batch->office->company->name,
             'batch_name' => $batch->name,
             'office_number' => $batch->office->number,
-            'departure_time' => date("h:i a", strtotime($batch->departure_time)) ,
+            'departure_time' => $this->formatBatchTime($batch->departure_time),
             'prilgims_count' => $batch->pilgrims_count,
         ];
         return $result;
+    }
+
+    public function formatBatchTime($batchTime){
+        $fullTime = date("h:i a", strtotime($batchTime));
+        $time = substr($fullTime,0,5);
+        $prefix = substr($fullTime,6) == "pm"? 'مساءً': 'صباحاً';
+        return  sprintf("%s %s",$prefix,$time);;
     }
 }

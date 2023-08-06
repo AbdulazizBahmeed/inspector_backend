@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\CampController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,5 +31,10 @@ Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'batches'], function 
 
 Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'camps'], function () {
     Route::get('', [CampController::class, 'index']);
+});
+
+Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'reports'], function () {
+    Route::get('', [ReportController::class, 'index']);
+    Route::get('{camp}', [ReportController::class, 'index']);
 });
 

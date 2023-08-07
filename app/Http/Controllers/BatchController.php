@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Camp;
 use App\Models\Zone;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 use function PHPSTORM_META\map;
@@ -46,15 +47,17 @@ class BatchController extends Controller
     }
     public function show($campId, $day)
     {
-        // $userId = auth()->user()->id;
-        // $zone = Zone::whereHas('camps', function ($query) use($campId) {
-        //     $query->where('id', $campId);
-        // })->with(['camps' => function ($query) use ($day) {
-        //     $query->with(['batches' => function ($query) use ($day) {
-        //         $query->where('departure_day', $day);
-        //     }]);
-        // }])->where('user_id', $userId)->first()->camps->first->batches;
-        // return $zone;
+        $validation = Validator::make(['camp_id' =>$campId, 'day'=> $day], [
+            'camp_id' => 'exists:camps,id',
+            'day' => 'exists:batches,departure_day',
+        ]);
+
+        if($validation->fails()){
+            return response()->json([
+                'status' => false,
+                'message' => $validation->errors(),
+            ], 400);
+        }
         $batches = Camp::with(['batches' => function ($query) use ($day) {
             $query->with(['camp','office.company'])->where('departure_day', $day);
         }])->where('id', $campId)->first()->batches;

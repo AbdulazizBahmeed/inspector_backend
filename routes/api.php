@@ -35,6 +35,6 @@ Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'camps'], function ()
 
 Route::group(['middleware' => ['auth:sanctum'],'prefix' => 'reports'], function () {
     Route::get('', [ReportController::class, 'index']);
-    Route::get('{camp}', [ReportController::class, 'index']);
+    Route::post('{campId}/{day}', [ReportController::class, 'store']);
 });
 

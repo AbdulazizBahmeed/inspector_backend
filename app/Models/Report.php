@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Report extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'departure_time',
+        'batch_id',
+    ];
 
     public function batch(): BelongsTo
     {

@@ -15,7 +15,7 @@ class CreateReportsTable extends Migration
     {
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->time("departure_time");
+            $table->timestamp("departure_time");
             $table->foreignId('batch_id')->constrained('batches','id')->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });

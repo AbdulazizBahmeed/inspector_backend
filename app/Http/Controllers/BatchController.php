@@ -59,7 +59,7 @@ class BatchController extends Controller
             ], 400);
         }
         $batches = Camp::with(['batches' => function ($query) use ($day) {
-            $query->with(['camp','office.company'])->where('departure_day', $day);
+            $query->with(['camp','office.company', 'report'])->where('departure_day', $day);
         }])->where('id', $campId)->first()->batches;
 
         $data=[];

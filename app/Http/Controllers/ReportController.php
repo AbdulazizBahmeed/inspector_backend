@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Camp;
 use App\Models\Question;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,24 +37,24 @@ class ReportController extends Controller
 
     public function store(Request $request, $campId, $day)
     {
-        $request->image->move(storage_path('images'),"myImage.png");
-        $validation = Validator::make(['camp_id' =>$campId, 'day'=> $day], [
-            'camp_id' => 'exists:camps,id',
-            'day' => 'exists:batches,departure_day',
+        $minmumAnswers =Question::where("optional", 'false')->count();
+        $validation = Validator::make(array_merge(['camp_id' =>$campId, 'day'=> $day], $request->all()), [
+            'camp_id' => 'required|exists:camps,id',
+            'day' => 'required|exists:batches,departure_day',
+            'answers' => 'required|array|min:'.$minmumAnswers,
+            'departure_time' => 'required|date',
         ]);
-
         if($validation->fails()){
             return response()->json([
                 'status' => false,
                 'message' => $validation->errors(),
             ], 400);
         }
-        $reportAnswers = [];
 
         foreach ($request->answers as $answer) {
             $validation = Validator::make($answer, [
                 'question_id' => 'required|exists:questions,id',
-                'answer' => 'exclude_if:question_id,4|required|string',
+                'content' => 'exclude_if:question_id,4|required|string',
                 'image' => 'exclude_unless:question_id,4|required|image',
             ]);
 
@@ -62,14 +64,44 @@ class ReportController extends Controller
                     'message' => $validation->errors(),
                 ], 400);
             }
-            $reportAnswers[] = $answer;
         }
 
+        $batches = Camp::with(['batches' => function ($query) use ($day) {
+            $query->whereDoesntHave('report')->where('departure_day', $day);
+        }])->where('id', $campId)->first()->batches->sortBy('departure_time')->values();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'received the data successfully',
-            'data' => $reportAnswers
-        ], 200);
+        $reportedBatch = $batches->first();
+        if($reportedBatch){
+            $report = Report::create([
+                "departure_time" => $request->departure_time,
+                "batch_id" => $reportedBatch->id
+            ]);
+
+            $imageCounter = 1;
+            forEach($request->answers as  $answer){
+                if($answer['question_id'] == 4){
+                    $fileName = 'report'.$report->id.',imageNumber'.$imageCounter.'.'.$answer['image']->extension();
+                    $answer['image']->move(public_path('storage'), $fileName);
+                    $answer['content'] = $fileName;
+                    $imageCounter++;
+                }
+                Answer::create([
+                    'content' => $answer['content'],
+                    'question_id' => $answer["question_id"],
+                    'report_id' => $report->id,
+                ]);
+            }
+            return response()->json([
+                'status' => true,
+                'message' => 'received the data successfully',
+                'data' => $report->with('answers')
+            ], 200);
+
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'there is no batches left for this camp and day',
+            ], 400);
+        }
     }
 }

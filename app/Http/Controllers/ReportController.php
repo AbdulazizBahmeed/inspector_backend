@@ -7,6 +7,7 @@ use App\Models\Camp;
 use App\Models\Question;
 use App\Models\Report;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class ReportController extends Controller
@@ -42,7 +43,7 @@ class ReportController extends Controller
             'camp_id' => 'required|exists:camps,id',
             'day' => 'required|exists:batches,departure_day',
             'answers' => 'required|array|min:'.$minmumAnswers,
-            'departure_time' => 'required|date',
+            // 'departure_time' => 'required|date',
         ]);
         if($validation->fails()){
             return response()->json([
@@ -73,7 +74,7 @@ class ReportController extends Controller
         $reportedBatch = $batches->first();
         if($reportedBatch){
             $report = Report::create([
-                "departure_time" => $request->departure_time,
+                "departure_time" => Carbon::now(),
                 "batch_id" => $reportedBatch->id
             ]);
 

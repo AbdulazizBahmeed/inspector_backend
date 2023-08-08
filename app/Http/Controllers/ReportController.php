@@ -53,11 +53,11 @@ class ReportController extends Controller
         }
 
         foreach ($request->answers as $answer) {
-            $validation = Validator::make($answer, [
+            $validatinRules = [
                 'question_id' => 'required|exists:questions,id',
-                'content' => 'exclude_if:question_id,4|required|string',
-                'image' => 'exclude_unless:question_id,4|required|image',
-            ]);
+                'content' =>$answer['question_id'] !=4?  'required|string':'required|image', 
+            ];
+            $validation = Validator::make($answer, $validatinRules);
 
             if ($validation->fails()) {
                 return response()->json([
@@ -81,8 +81,8 @@ class ReportController extends Controller
             $imageCounter = 1;
             forEach($request->answers as  $answer){
                 if($answer['question_id'] == 4){
-                    $fileName = 'report'.$report->id.',imageNumber'.$imageCounter.'.'.$answer['image']->extension();
-                    $answer['image']->move(public_path('storage'), $fileName);
+                    $fileName = 'report'.$report->id.',imageNumber'.$imageCounter.'.'.$answer['content']->extension();
+                    $answer['content']->move(public_path('storage'), $fileName);
                     $answer['content'] = $fileName;
                     $imageCounter++;
                 }

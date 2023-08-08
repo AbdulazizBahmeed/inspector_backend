@@ -35,7 +35,8 @@ class AuthController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'user logged in Successfully',
-                'token' => substr($user->createToken("API TOKEN")->plainTextToken, 3)
+                'token' => $user->createToken("API TOKEN")->plainTextToken,
+                'fullname' => $user->fullname
             ], 200);
         }
     }
@@ -51,10 +52,12 @@ class AuthController extends Controller
                 'message' => 'the user name and password does not match our records',
             ], 401);
         } else {
+            $user = auth()->user();
             return response()->json([
                 'status' => true,
                 'message' => 'user logged in Successfully',
-                'token' => substr(auth()->user()->createToken("API TOKEN")->plainTextToken, 3)
+                'token' => $user->createToken("API TOKEN")->plainTextToken,
+                'fullname' => $user->fullname
             ], 200);
         }
     }

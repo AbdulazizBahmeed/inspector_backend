@@ -95,7 +95,6 @@ class ReportController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'received the data successfully',
-                'data' => $report->with('answers')
             ], 200);
 
         } else {

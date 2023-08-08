@@ -72,7 +72,9 @@ class BatchController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'retrieved the data successfully',
-            'data' => $data
+            'data' => $data,
+            'camp_number' => $batches->isEmpty()? null:$batches[0]->camp->camp_label,
+            'camp_upgraded_number' => $batches->isEmpty()? null:$batches[0]->camp->upgraded_camp_label,
         ], 200);
     }
 

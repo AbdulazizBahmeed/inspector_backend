@@ -15,14 +15,15 @@ class ReportController extends Controller
     public function index()
     {
         $questions = Question::with('type')->get();
-        $questions = $questions->map(function ($question) {
+        $questionsFormated = $questions->map(function ($question) {
             return $this->foramtQuestion($question);
         })->groupBy('type_name');
 
         return response()->json([
             'status' => true,
             'message' => 'retrieved the data',
-            'data' => $questions,
+            'data' => $questionsFormated,
+            'camp_number' => $questions->isEmpty()? null:$questions[0],
         ], 200);
     }
 
@@ -38,12 +39,10 @@ class ReportController extends Controller
 
     public function store(Request $request, $campId, $day)
     {
-        $minmumAnswers =Question::where("optional", 'false')->count();
+        return $request->all();
         $validation = Validator::make(array_merge(['camp_id' =>$campId, 'day'=> $day], $request->all()), [
             'camp_id' => 'required|exists:camps,id',
             'day' => 'required|exists:batches,departure_day',
-            'answers' => 'required|array|min:'.$minmumAnswers,
-            // 'departure_time' => 'required|date',
         ]);
         if($validation->fails()){
             return response()->json([
@@ -51,8 +50,10 @@ class ReportController extends Controller
                 'message' => $validation->errors(),
             ], 400);
         }
-
-        foreach ($request->answers as $answer) {
+        $answers =[];
+        foreach ($request->answers as $key => $answer) {
+            $answer = ['question_id' => strval($key), 'content' => $answer];
+            $answers[] = $answer;
             $validatinRules = [
                 'question_id' => 'required|exists:questions,id',
                 'content' =>$answer['question_id'] !=4?  'required|string':'required|image', 
@@ -79,7 +80,7 @@ class ReportController extends Controller
             ]);
 
             $imageCounter = 1;
-            forEach($request->answers as  $answer){
+            forEach($answers as  $answer){
                 if($answer['question_id'] == 4){
                     $fileName = 'report'.$report->id.',imageNumber'.$imageCounter.'.'.$answer['content']->extension();
                     $answer['content']->move(public_path('storage'), $fileName);

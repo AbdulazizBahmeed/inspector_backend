@@ -7,16 +7,17 @@ use App\Models\Zone;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
-use function PHPSTORM_META\map;
-
 class BatchController extends Controller
 {
     public function index()
     {
         $user = auth()->user();
         $zones = Zone::with(['camps' => function ($query) {
-            $query->with(['batches.office.company', 'batches.camp']);
+            $query->with(['batches' => function($querey){
+                $querey->with(['office.company', 'camp', 'report'])->doesntHave('report');
+            }]);
         }])->where('user_id', $user->id)->get();
+
         $data = [
             'day 9' => [],
             'day 10' => [],
@@ -24,6 +25,7 @@ class BatchController extends Controller
             'day 12' => [],
             'day 13' => [],
         ];
+
         foreach ($zones as $zone) {
             foreach ($zone->camps as $camp) {
                 foreach ($camp->batches as $batch) {

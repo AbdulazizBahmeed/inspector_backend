@@ -11,7 +11,9 @@ class CampController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $zones = Zone::with(['camps.batches'])->where('user_id', $user->id)->get();
+        $zones = Zone::with(['camps' => function($query){
+            $query->doesntHave('batches.report');
+        }])->where('user_id', $user->id)->get();
 
         $data = [
             'day 9' => collect(),

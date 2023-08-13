@@ -39,7 +39,6 @@ class ReportController extends Controller
 
     public function store(Request $request, $campId, $day)
     {
-        return $request->all();
         $validation = Validator::make(array_merge(['camp_id' =>$campId, 'day'=> $day], $request->all()), [
             'camp_id' => 'required|exists:camps,id',
             'day' => 'required|exists:batches,departure_day',
@@ -56,7 +55,7 @@ class ReportController extends Controller
             $answers[] = $answer;
             $validatinRules = [
                 'question_id' => 'required|exists:questions,id',
-                'content' =>$answer['question_id'] !=4?  'required|string':'required|image', 
+                'content' =>$answer['question_id'] !="5"?  'required|string':'required|image', 
             ];
             $validation = Validator::make($answer, $validatinRules);
 
@@ -81,7 +80,8 @@ class ReportController extends Controller
 
             $imageCounter = 1;
             forEach($answers as  $answer){
-                if($answer['question_id'] == 4){
+                if($answer['question_id'] == "5"){
+                    
                     $fileName = 'report'.$report->id.',imageNumber'.$imageCounter.'.'.$answer['content']->extension();
                     $answer['content']->move(public_path('storage'), $fileName);
                     $answer['content'] = $fileName;

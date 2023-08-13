@@ -61,6 +61,11 @@ class BatchController extends Controller
         $batches = Camp::with(['batches' => function ($query) use ($day) {
             $query->with(['camp','office.company', 'report'])->where('departure_day', $day);
         }])->where('id', $campId)->first()->batches;
+        
+        $reportsCount = 0;
+        foreach($batches as $batch){
+            if($batch->report) $reportsCount++;
+        }
 
         $data=[];
         $sortedBatches = $batches->sortBy('departure_time')->values();
@@ -73,6 +78,7 @@ class BatchController extends Controller
             'status' => true,
             'message' => 'retrieved the data successfully',
             'data' => $data,
+            'reports_count' => $reportsCount,
             'camp_number' => $batches->isEmpty()? null:$batches[0]->camp->camp_label,
             'camp_upgraded_number' => $batches->isEmpty()? null:$batches[0]->camp->upgraded_camp_label,
         ], 200);

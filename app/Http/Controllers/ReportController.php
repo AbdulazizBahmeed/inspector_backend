@@ -50,7 +50,7 @@ class ReportController extends Controller
             ], 400);
         }
         $answers =[];
-        foreach ($request->answers as $key => $answer) {
+        foreach ($request->all() as $key => $answer) {
             $answer = ['question_id' => strval($key), 'content' => $answer];
             $answers[] = $answer;
             $validatinRules = [

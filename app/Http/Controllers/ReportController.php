@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Answer;
+use App\Models\Batch;
 use App\Models\Camp;
 use App\Models\Question;
 use App\Models\Report;
@@ -39,39 +40,31 @@ class ReportController extends Controller
 
     public function store(Request $request, $campId, $day)
     {
-        $validation = Validator::make(array_merge(['camp_id' =>$campId, 'day'=> $day], $request->all()), [
+        $answers =[];
+        foreach ($request->all() as $key => $answer) {
+            $answersObject['question_id'] = strval($key);
+            $answersObject['content'] = $answer;
+            if($answersObject['question_id'] == "4" ) $answersObject['image'] = $answer;
+
+            $answers["answers"][] = $answersObject;
+        }
+
+        $validation = Validator::make(array_merge(['camp_id' =>$campId, 'day'=> $day], $answers), [
             'camp_id' => 'required|exists:camps,id',
             'day' => 'required|exists:batches,departure_day',
+            'answers.*.question_id' => 'required|exists:questions,id',
+            'answers.*.content' =>"exclude_if:answers.*.question_id,4|string",
+            'answers.*.image' =>"exclude_unless:answers.*.question_id,4|image"
         ]);
+
         if($validation->fails()){
             return response()->json([
                 'status' => false,
                 'message' => $validation->errors(),
             ], 400);
         }
-        $answers =[];
-        foreach ($request->all() as $key => $answer) {
-            $answer = ['question_id' => strval($key), 'content' => $answer];
-            $answers[] = $answer;
-            $validatinRules = [
-                'question_id' => 'required|exists:questions,id',
-                'content' =>$answer['question_id'] !="5"?  'required|string':'required|image', 
-            ];
-            $validation = Validator::make($answer, $validatinRules);
-
-            if ($validation->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $validation->errors(),
-                ], 400);
-            }
-        }
-
-        $batches = Camp::with(['batches' => function ($query) use ($day) {
-            $query->whereDoesntHave('report')->where('departure_day', $day);
-        }])->where('id', $campId)->first()->batches->sortBy('departure_time')->values();
-
-        $reportedBatch = $batches->first();
+        $inputs =$validation->validated();
+        $reportedBatch = Batch::where('departure_day', $inputs["day"])->where("camp_id",$inputs["camp_id"])->get()->sortBy('departure_time')->first();
         if($reportedBatch){
             $report = Report::create([
                 "departure_time" => Carbon::now(),
@@ -79,11 +72,10 @@ class ReportController extends Controller
             ]);
 
             $imageCounter = 1;
-            forEach($answers as  $answer){
-                if($answer['question_id'] == "5"){
-                    
-                    $fileName = 'report'.$report->id.',imageNumber'.$imageCounter.'.'.$answer['content']->extension();
-                    $answer['content']->move(public_path('storage'), $fileName);
+            forEach($inputs["answers"] as  $answer){
+                if($answer['question_id'] == "4"){
+                    $fileName = 'report'.$report->id.',imageNumber'.$imageCounter.'.'.$answer['image']->extension();
+                    $answer['image']->move(public_path('storage'), $fileName);
                     $answer['content'] = $fileName;
                     $imageCounter++;
                 }

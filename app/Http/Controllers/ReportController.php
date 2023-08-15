@@ -64,7 +64,7 @@ class ReportController extends Controller
             ], 400);
         }
         $inputs =$validation->validated();
-        $reportedBatch = Batch::where('departure_day', $inputs["day"])->where("camp_id",$inputs["camp_id"])->get()->sortBy('departure_time')->first();
+        $reportedBatch = Batch::with('report')->where('departure_day', $inputs["day"])->where("camp_id",$inputs["camp_id"])->doesntHave('report')->get()->sortBy('departure_time')->first();
         if($reportedBatch){
             $report = Report::create([
                 "departure_time" => Carbon::now(),

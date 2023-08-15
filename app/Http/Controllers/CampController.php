@@ -12,7 +12,9 @@ class CampController extends Controller
     {
         $user = auth()->user();
         $zones = Zone::with(['camps' => function($query){
-            $query->doesntHave('batches.report');
+            $query->with(['batches' => function ($query) {
+                $query->doesntHave("report");
+            }]);
         }])->where('user_id', $user->id)->get();
 
         $data = [
